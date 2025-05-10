@@ -9,8 +9,9 @@ import Img7NFT from "../src/assets/img7nft.jpg";
 import Img8NFT from "../src/assets/img8nft.jpg";
 import Img9NFT from "../src/assets/img9nft.jpg";
 import Img10NFT from "../src/assets/img10nft.jpg";
+import { useCart } from './CartContext';
 
-export default function HotProductsSection() {
+export default function HotProductsSection({ boughtIds = [] }) {
   // Sample hot NFT products data
   const hotProducts = [
     {
@@ -85,8 +86,15 @@ export default function HotProductsSection() {
     }
   ];
 
+  // Filter out bought NFTs
+  const visibleProducts = hotProducts.filter(
+    (product) => !boughtIds.includes(product.id)
+  );
+
   // State for scroll navigation
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [notification, setNotification] = useState({ show: false, message: '' });
+  const { cart, addToCart } = useCart();
 
   // Handle scroll left
   const scrollLeft = () => {
@@ -106,6 +114,26 @@ export default function HotProductsSection() {
       container.scrollTo({ left: newPosition, behavior: 'smooth' });
       setScrollPosition(newPosition);
     }
+  };
+
+  // Handle add to cart
+  const handleAddToCart = (product) => {
+    const isProductInCart = cart.some(item => item.id === product.id);
+    if (isProductInCart) {
+      setNotification({
+        show: true,
+        message: `${product.name} is already in your cart`
+      });
+    } else {
+      addToCart({ ...product, quantity: 1 });
+      setNotification({
+        show: true,
+        message: `${product.name} added to cart`
+      });
+    }
+    setTimeout(() => {
+      setNotification({ show: false, message: '' });
+    }, 2000);
   };
 
   return (
@@ -150,7 +178,7 @@ export default function HotProductsSection() {
             msOverflowStyle: 'none',
           }}
         >
-          {hotProducts.map((product) => (
+          {visibleProducts.map((product) => (
             <div 
               key={product.id} 
               className="snap-start flex-none w-64 mr-4 group cursor-pointer h-96"
@@ -163,7 +191,11 @@ export default function HotProductsSection() {
                     alt={product.name} 
                     className="w-full h-64 object-cover"
                   />
-                  
+                  {cart.some(item => item.id === product.id) && (
+                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                      In Cart
+                    </div>
+                  )}
                 </div>
                 
                 {/* NFT Details - using flex-grow to fill available space */}
@@ -183,11 +215,19 @@ export default function HotProductsSection() {
                   
                   {/* Push button to bottom with margin-top auto */}
                   <div className="mt-auto">
-                    <button className="w-full py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-all duration-300 flex items-center justify-center">
+                    <button
+                      onClick={() => handleAddToCart(product)}
+                      disabled={cart.some(item => item.id === product.id)}
+                      className={`w-full py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center ${
+                        cart.some(item => item.id === product.id)
+                          ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                          : 'bg-purple-600 text-white hover:bg-purple-700'
+                      }`}
+                    >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
-                      Add to cart
+                      {cart.some(item => item.id === product.id) ? 'In Cart' : 'Add to cart'}
                     </button>
                   </div>
                 </div>
@@ -196,6 +236,16 @@ export default function HotProductsSection() {
           ))}
         </div>
         
+        {/* Notification */}
+        {notification.show && (
+          <div className="fixed bottom-4 right-4 bg-black/80 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {notification.message}
+          </div>
+        )}
+
         {/* Custom style for hiding scrollbar */}
         <style jsx>{`
           .hide-scrollbar::-webkit-scrollbar {
