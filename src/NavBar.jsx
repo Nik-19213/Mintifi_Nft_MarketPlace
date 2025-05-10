@@ -185,8 +185,14 @@ export default function Navbar({ onBuy }) {
       </nav>
       {/* Cart Modal */}
       {cartModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="backdrop-blur-md bg-violet-400/5 border border-white/20 shadow-lg rounded-lg  max-w-md w-full p-6 relative">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          onClick={() => setCartModalOpen(false)}
+        >
+          <div
+            className="backdrop-blur-md bg-violet-400/5 border border-white/20 shadow-lg rounded-lg  max-w-md w-full p-6 relative"
+            onClick={e => e.stopPropagation()}
+          >
             <button
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
               onClick={() => setCartModalOpen(false)}
@@ -203,9 +209,11 @@ export default function Navbar({ onBuy }) {
               </div>
             ) : (
               <>
-                <ul className="divide-y divide-gray-200 max-h-64 overflow-y-auto">
+                <ul
+                  className="divide-y divide-gray-200 max-h-64 overflow-y-auto custom-scrollbar"
+                >
                   {cart.map(item => (
-                    <li key={item.id} className="py-3 flex items-center">
+                    <li key={item.id} className="py-3 pr-6 flex items-center">
                       <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded mr-4" />
                       <div className="flex-1">
                         <div className="font-semibold text-gray-400">{item.name}</div>
@@ -262,6 +270,29 @@ export default function Navbar({ onBuy }) {
           </div>
         </div>
       )}
+      {/* Custom scrollbar styles */}
+      <style jsx>{`
+        .custom-scrollbar {
+  /* For Firefox */
+  scrollbar-width: thin; /* 'thin' is the thinnest official value */
+  scrollbar-color: #a78bfa #18181b;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 2px; /* 1px is too thin to be usable, 2px is minimum recommended */
+  background: #18181b;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #a78bfa;
+  border-radius: 999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #18181b;
+  border-radius: 999px;
+}
+      `}</style>
     </div>
   );
 }

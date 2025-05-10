@@ -35,8 +35,8 @@ export default function Footer() {
               <ul className="space-y-2">
                 <li><a href="/contact" className="text-gray-400 hover:text-white transition">Contact Us</a></li>
                 <li><a href="/faq" className="text-gray-400 hover:text-white transition">FAQ</a></li>
-                <li><a href="/returns" className="text-gray-400 hover:text-white transition">Returns & Exchanges</a></li>
-                <li><a href="/shipping" className="text-gray-400 hover:text-white transition">Shipping Info</a></li>
+               
+          
               </ul>
             </div>
             
@@ -55,7 +55,6 @@ export default function Footer() {
               <ul className="space-y-2">
                 <li><a href="/terms" className="text-gray-400 hover:text-white transition">Terms of Service</a></li>
                 <li><a href="/privacy" className="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
-                <li><a href="/refund" className="text-gray-400 hover:text-white transition">Refund Policy</a></li>
                 <li><a href="/cookies" className="text-gray-400 hover:text-white transition">Cookie Policy</a></li>
               </ul>
             </div>
