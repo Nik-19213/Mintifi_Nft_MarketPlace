@@ -6,7 +6,7 @@ Welcome to **Mintify**, a sleek and user-friendly NFT marketplace designed for c
 
 ## 🌐 Live Demo
 
-> Coming Soon – Stay tuned for the launch of our official demo!
+>  mintifi.vercel.app  – Stay tuned for the launch of our official demo!
 
 ---
 
@@ -42,4 +42,4 @@ cd mintify
 npm install
 
 # 3. Run the React app
-npm start
+npm run dev
