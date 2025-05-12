@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { BrowserProvider, parseEther } from "ethers"; // Ethers v6+ import
 import Logo from "../src/assets/mintifi.png";
 import { useCart } from "./CartContext";
 
@@ -6,8 +7,13 @@ export default function Navbar({ onBuy }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [walletConnected, setWalletConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState(null);
   const [cartModalOpen, setCartModalOpen] = useState(false);
+  const [buying, setBuying] = useState(false);
   const { cart, clearCart, getCartTotal, removeFromCart } = useCart();
+
+  // Specify the website owner's address here
+  const OWNER_ADDRESS = "0xf7F8Ef8411da7821E4E4c9f03E9CaBa86006c687"; // Replace with actual address
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,8 +33,97 @@ export default function Navbar({ onBuy }) {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  const handleConnectWallet = () => {
-    setWalletConnected(!walletConnected);
+  const handleConnectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        // Use Ethers.js v6+ to request accounts
+        const provider = new BrowserProvider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = await provider.getSigner();
+        const address = await signer.getAddress();
+
+        setWalletConnected(true);
+        setWalletAddress(address);
+      } catch (err) {
+        setWalletConnected(false);
+        setWalletAddress(null);
+        alert("Wallet connection failed: " + err.message);
+      }
+    } else {
+      alert("MetaMask is not installed. Please install MetaMask and try again.");
+    }
+  };
+
+  // Helper to get total ETH value in cart (parse price correctly)
+  const getTotalEth = () => {
+    return cart.reduce((sum, item) => {
+      // Extract only the numeric part of the price string (e.g., "0.0001 ETH" -> 0.0001)
+      let price = 0;
+      if (typeof item.price === "string") {
+        const match = item.price.match(/[\d.]+/);
+        price = match ? parseFloat(match[0]) : 0;
+      } else {
+        price = Number(item.price) || 0;
+      }
+      return sum + price * (item.quantity || 1);
+    }, 0);
+  };
+
+  // Send ETH from connected wallet to owner on Buy
+  const handleBuy = async () => {
+    if (!walletConnected || !walletAddress) {
+      alert("Please connect your MetaMask wallet before buying.");
+      return;
+    }
+
+    const hasEth = cart.some(item => typeof item.price === "string" && item.price.includes("ETH"));
+    if (!hasEth) {
+      alert("Only ETH payments are supported for this demo.");
+      return;
+    }
+
+    const totalEth = getTotalEth();
+    if (totalEth <= 0) {
+      alert("Cart total is zero.");
+      return;
+    }
+
+    setBuying(true);
+    try {
+      // Create a BrowserProvider instance (Ethers v6+)
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+      // Prepare transaction parameters
+      const tx = {
+        to: OWNER_ADDRESS,
+        value: parseEther(totalEth.toFixed(18)) // Fix: round to 18 decimals
+      };
+
+      // Send transaction
+      const transaction = await signer.sendTransaction(tx);
+
+      // Wait for transaction confirmation
+      const receipt = await transaction.wait(1);
+
+      // Detailed success handling
+      if (receipt.status === 1) {
+        alert(`Payment successful! Transaction Hash: ${transaction.hash}`);
+        
+        if (typeof onBuy === "function") {
+          onBuy(cart.map(item => item.id));
+        }
+        clearCart();
+        setCartModalOpen(false);
+      } else {
+        alert("Transaction failed.");
+      }
+    } catch (err) {
+      console.error("Transaction error:", err);
+      alert(`Transaction failed: ${err.message}`);
+    } finally {
+      setBuying(false);
+    }
   };
 
   const icons = {
@@ -122,12 +217,16 @@ export default function Navbar({ onBuy }) {
                 onClick={handleConnectWallet}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
                   walletConnected 
-                    ? "bg-green-500/30 hover:bg-green-500/40 text-white" 
+                    ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" 
                     : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
                 }`}
               >
                 <span className="mr-1">{icons.wallet}</span>
-                <span>{walletConnected ? "Wallet Connected" : "Connect Wallet"}</span>
+                <span>
+                  {walletConnected && walletAddress
+                    ? `Connected: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+                    : "Connect Wallet"}
+                </span>
               </button>
             </div>
             
@@ -171,12 +270,16 @@ export default function Navbar({ onBuy }) {
                   onClick={handleConnectWallet}
                   className={`flex items-center w-full px-3 py-2 rounded-lg transition-all duration-200 ${
                     walletConnected 
-                      ? "bg-green-500/30 hover:bg-green-500/40 text-white" 
+                      ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" 
                       : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
                   }`}
                 >
                   <span className="mr-2">{icons.wallet}</span>
-                  <span>{walletConnected ? "Wallet Connected" : "Connect Wallet"}</span>
+                  <span>
+                    {walletConnected && walletAddress
+                      ? `Connected: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+                      : "Connect Wallet"}
+                  </span>
                 </button>
               </div>
             </div>
@@ -198,7 +301,7 @@ export default function Navbar({ onBuy }) {
               onClick={() => setCartModalOpen(false)}
               aria-label="Close"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -240,12 +343,8 @@ export default function Navbar({ onBuy }) {
                         // Show ETH if any price is string with ETH, else show as number
                         const hasEth = cart.some(item => typeof item.price === "string" && item.price.includes("ETH"));
                         if (hasEth) {
-                          // Sum ETH values
-                          const total = cart.reduce((sum, item) => {
-                            const price = typeof item.price === "string" ? parseFloat(item.price) : Number(item.price) || 0;
-                            return sum + price * (item.quantity || 1);
-                          }, 0);
-                          return `${total.toFixed(2)} ETH`;
+                          // Use getTotalEth for correct calculation
+                          return `${getTotalEth().toFixed(4)} ETH`;
                         } else {
                           return `$${getCartTotal().toFixed(2)}`;
                         }
@@ -253,16 +352,17 @@ export default function Navbar({ onBuy }) {
                     </span>
                   </div>
                   <button
-                    className="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold"
-                    onClick={() => {
-                      if (typeof onBuy === "function") {
-                        onBuy(cart.map(item => item.id));
-                      }
-                      clearCart();
-                      setCartModalOpen(false);
-                    }}
+                    className="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold flex items-center justify-center"
+                    onClick={handleBuy}
+                    disabled={buying}
                   >
-                    Buy
+                    {buying && (
+                      <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                      </svg>
+                    )}
+                    {buying ? "Processing..." : "Buy"}
                   </button>
                 </div>
               </>
