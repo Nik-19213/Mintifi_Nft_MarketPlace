@@ -6,7 +6,7 @@ Welcome to **Mintify**, a sleek and user-friendly NFT marketplace designed for c
 
 ## 🌐 Live Demo
 
->  [mintifi.vercel.app](https://mintify.vercel.app)  – Stay tuned for the launch of our official demo!
+>  Visit the live app at [mintify.vercel.app](https://mintify.vercel.app)  – Stay tuned for the launch of our official demo!
 
 ---
 
