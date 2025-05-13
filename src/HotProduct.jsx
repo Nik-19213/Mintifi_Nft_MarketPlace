@@ -18,70 +18,70 @@ export default function HotProductsSection({ boughtIds = [] }) {
       id: 1,
       name: "Fears Lord Warrior",
       creator: "vikram01",
-      price: "0.0001 ETH",
+      price: "0.000001 ETH",
       image: Img1NFT
     },
     {
       id: 2,
       name: "Great Titans",
       creator: "ByteArtist",
-      price: "0.0001 ETH",
+      price: "0.000001 ETH",
       image: Img2NFT
     },
     {
       id: 3,
       name: "Ancient Archer",
       creator: "PixelPunk",
-      price: "0.0002 ETH",
+      price: "0.000002 ETH",
       image: Img3NFT
     },
     {
       id: 4,
       name: "Eternral",
       creator: "VoidCreator",
-      price: "0.0002 ETH",
+      price: "0.000002 ETH",
       image: Img4NFT
     },
     {
       id: 5,
       name: "Ancient warrior",
       creator: "DreamWeaver",
-      price: "0.0001 ETH",
+      price: "0.000001 ETH",
       image: Img5NFT
     },
     {
       id: 6,
       name: "Alex Rcihard",
       creator: "FutureForm",
-      price: "0.0001 ETH",
+      price: "0.000001 ETH",
       image: Img6NFT
     },
     {
       id: 7,
       name: "Prince Vikramaditya",
       creator: "WaveFunction",
-      price: "0.0001 ETH",
+      price: "0.000001 ETH",
       image: Img7NFT
     },
     {
       id: 8,
       name: "King Drona",
       creator: "ByteMaster",
-      price: "0.0001 ETH",
+      price: "0.000001 ETH",
       image: Img8NFT
     },
     {
       id: 9,
       name: "Mystic Queen",
       creator: "StarForger",
-      price: "0.0001 ETH",
+      price: "0.000001 ETH",
       image: Img9NFT
     },
     {
       id: 10,
       name: "Aurora Williams",
       creator: "8BitLegend",
-      price: "0.0001 ETH",
+      price: "0.000001 ETH",
       image: Img10NFT
     }
   ];
