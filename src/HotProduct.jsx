@@ -190,15 +190,15 @@ export default function HotProductsSection({ boughtIds = [] }) {
             {visibleProducts.map((product) => (
               <div 
                 key={product.id} 
-                className="snap-start flex-none w-64 mr-4 group cursor-pointer h-96"
+                className="snap-start flex-none w-72 mr-4 group cursor-pointer"
               >
-                <div className="backdrop-blur-md bg-white/10 border border-white/20 shadow-lgrounded-xl overflow-hidden transition-all duration-300 transform hover:-translate-y-2 hover:shadow-xl hover:shadow-purple-500/20 h-full flex flex-col">
+                <div className="backdrop-blur-md bg-white/10 border border-white/20 shadow-lgrounded-xl overflow-hidden transition-all duration-300 transform hover:-translate-y-2 hover:shadow-xl hover:shadow-purple-500/20 flex flex-col">
                   {/* NFT Image - fixed height */}
                   <div className="relative">
                     <img 
                       src={product.image} 
                       alt={product.name} 
-                      className="w-full h-64 object-cover"
+                      className="w-full h-72 object-cover"
                     />
                     {cart.some(item => item.id === product.id) && (
                       <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
@@ -217,7 +217,7 @@ export default function HotProductsSection({ boughtIds = [] }) {
                         <p className="text-gray-400 text-sm">by @{product.creator}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-gray-400 text-xs">Price</p>
+                        <p className="text-gray-400 text-xs text-left">Price:</p>
                         <p className="text-purple-400 font-bold">{product.price}</p>
                       </div>
                     </div>

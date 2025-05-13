@@ -56,11 +56,12 @@ export default function Navbar({ onBuy }) {
 
   // Helper to get total ETH value in cart (parse price correctly)
   const getTotalEth = () => {
+    // Use parseFloat and sum as floats, not integers
     return cart.reduce((sum, item) => {
-      // Extract only the numeric part of the price string (e.g., "0.0001 ETH" -> 0.0001)
       let price = 0;
       if (typeof item.price === "string") {
-        const match = item.price.match(/[\d.]+/);
+        // Support scientific notation and very small numbers
+        const match = item.price.match(/[\d.eE-]+/);
         price = match ? parseFloat(match[0]) : 0;
       } else {
         price = Number(item.price) || 0;
@@ -344,7 +345,9 @@ export default function Navbar({ onBuy }) {
                         const hasEth = cart.some(item => typeof item.price === "string" && item.price.includes("ETH"));
                         if (hasEth) {
                           // Use getTotalEth for correct calculation
-                          return `${getTotalEth().toFixed(4)} ETH`;
+                          const total = getTotalEth();
+                          // Show up to 6 decimals for small values
+                          return `${total < 0.0001 ? total.toFixed(6) : total.toFixed(4)} ETH`;
                         } else {
                           return `$${getCartTotal().toFixed(2)}`;
                         }
